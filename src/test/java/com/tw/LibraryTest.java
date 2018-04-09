@@ -6,8 +6,8 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
-public class GeneralApplicationTest {
-    GeneralApplication app = new GeneralApplication();
+public class LibraryTest {
+    Library app = new Library();
 
     @Test
     public void applicationPrintTest(){

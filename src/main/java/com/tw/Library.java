@@ -8,11 +8,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class GeneralApplication {
+public class Library {
     private List<Student> students = new ArrayList<>();
 
     public static void main(String[] args){
-        GeneralApplication app = new GeneralApplication();
+        Library app = new Library();
         Scanner scanner = new Scanner(System.in);
         backToMainMenu(app);
         String s = scanner.nextLine();
@@ -70,7 +70,7 @@ public class GeneralApplication {
         }
     }
 
-    public static void backToMainMenu(GeneralApplication app) {
+    public static void backToMainMenu(Library app) {
         System.out.println(app.printHelpMessage());
     }
 
