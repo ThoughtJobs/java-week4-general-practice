@@ -9,8 +9,8 @@ public class GeneralApplication {
 
     public static void main(String[] args){
         GeneralApplication app = new GeneralApplication();
-        System.out.println(app.printHelpMessage());
         Scanner scanner = new Scanner(System.in);
+        backToMainMenu(app);
         String s = scanner.nextLine();
         boolean pendingOnStep1 = false;
         boolean pendingOnStep2 = false;
@@ -21,7 +21,7 @@ public class GeneralApplication {
                     Student student = app.createStudentRecord(s);
                     System.out.println(String.format("学生%s的成绩被添加", student.getName()));
                     pendingOnStep1 = false;
-                    System.out.println(app.printHelpMessage());
+                    backToMainMenu(app);
                     s = scanner.nextLine();
                     continue;
                 }else{
@@ -35,7 +35,7 @@ public class GeneralApplication {
                 if(list.size() > 0){
                     System.out.println(app.generateStudentScoreSheet(list));
                     pendingOnStep2 = false;
-                    System.out.println(app.printHelpMessage());
+                    backToMainMenu(app);
                     s = scanner.nextLine();
                     continue;
                 }else{
@@ -60,10 +60,14 @@ public class GeneralApplication {
                 s = scanner.nextLine();
                 continue;
             }
-            System.out.println(app.printHelpMessage());
+            backToMainMenu(app);
             s = scanner.nextLine();
             continue;
         }
+    }
+
+    public static void backToMainMenu(GeneralApplication app) {
+        System.out.println(app.printHelpMessage());
     }
 
     public static boolean StringIsNumber(String s) {
@@ -83,7 +87,7 @@ public class GeneralApplication {
             totalScores.add(s.GetTotalScore());
         }
         output += "========================\n";
-        double classAverage = 0.0, classTotalScore = 0.0;
+        double classAverage, classTotalScore = 0.0;
         for(Double score: totalScores){
             classTotalScore += score;
         }
@@ -145,7 +149,6 @@ public class GeneralApplication {
         initializeScores(student, scores);
         students.add(student);
         return student;
-
     }
 
     private void initializeScores(Student student, String scores) {
