@@ -73,6 +73,23 @@ public class GeneralApplicationTest {
                 "========================\n" +
                 "全班总分平均数：340\n" +
                 "全班总分中位数：340", scoreSheet);
+    }
 
+    @Test
+    public void should_generate_student_score_sheet_for_multiple_student_id(){
+        GeneralApplication app = new GeneralApplication(System.in);
+        String input = "zhangsan, 001, Math: 75, Yuwen: 95, English: 80, Programming: 80";
+        app.createStudentRecord(input);
+        input = "lisi, 002, Math: 85, Yuwen: 80, English: 70, Programming: 90";
+        app.createStudentRecord(input);
+        String scoreSheet = app.generateStudentScoreSheet(Arrays.asList("001", "002"));
+        assertEquals("成绩单\n" +
+                "Name|Math|Yuwen|English|Programming|平均分|总分\n" +
+                "========================\n" +
+                "zhangsan|75|95|80|80|82.5|330\n" +
+                "lisi|85|80|70|90|81.25|325\n" +
+                "========================\n" +
+                "全班总分平均数：327.5\n" +
+                "全班总分中位数：327.5", scoreSheet);
     }
 }

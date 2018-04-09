@@ -23,8 +23,12 @@ public class GeneralApplication {
         while(true){
             if(pendingOnStep1){
                 if(app.matchStep1Input(s)){
+                    app.createStudentRecord(s);
                     System.out.println("学生xxx的成绩被添加");
                     pendingOnStep1 = false;
+                    System.out.println(app.printHelpMessage());
+                    s = scanner.nextLine();
+                    continue;
                 }else{
                     System.out.println("请按正确的格式输入（格式：姓名, 学号, 学科: 成绩, ...）：");
                     s = scanner.nextLine();
@@ -36,6 +40,9 @@ public class GeneralApplication {
                 if(list.size() > 0){
                     System.out.println(app.generateStudentScoreSheet(list));
                     pendingOnStep2 = false;
+                    System.out.println(app.printHelpMessage());
+                    s = scanner.nextLine();
+                    continue;
                 }else{
                     System.out.println("请按正确的格式输入要打印的学生的学号（格式： 学号, 学号,...），按回车提交：");
                     s = scanner.nextLine();
@@ -58,12 +65,7 @@ public class GeneralApplication {
                 s = scanner.nextLine();
                 continue;
             }
-
-            System.out.println("your input is: " + s);
-            System.out.println(app.printHelpMessage());
-            s = scanner.nextLine();
         }
-
     }
 
     public String generateStudentScoreSheet(List<String> input) {
@@ -84,7 +86,7 @@ public class GeneralApplication {
             classTotalScore += score;
         }
         classAverage = classTotalScore / totalScores.size();
-        DecimalFormat df = new DecimalFormat("###.#");
+        DecimalFormat df = new DecimalFormat("###.##");
         output += String.format("全班总分平均数：%s\n", df.format(classAverage));
         output += String.format("全班总分中位数：%s", df.format(getMedianScore(totalScores)));
         return output;
@@ -100,9 +102,15 @@ public class GeneralApplication {
 
     public List<String> matchStep2Input(String input) {
         String[] ids = input.split(",");
-        List<String> inputList = Arrays.asList(ids);
         List<String> studentIds = students.stream().map(s -> s.getId()).collect(Collectors.toList());
-        return inputList.stream().filter(i -> studentIds.contains(i)).collect(Collectors.toList());
+        List<String> output = new ArrayList<>();
+        for(String id: ids){
+            boolean contains = studentIds.contains(id);
+            if(contains){
+                output.add(id);
+            }
+        }
+        return output;
     }
 
     public boolean matchStep1Input(String message) {

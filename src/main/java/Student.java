@@ -39,7 +39,7 @@ public class Student {
             print += c.getScore() + "|";
             totalScore += c.getScore();
         }
-        DecimalFormat df = new DecimalFormat("###.#");
+        DecimalFormat df = new DecimalFormat("###.##");
         double average = totalScore / courses.size();
         print += df.format(average) + "|" + df.format(totalScore);
         return print;
