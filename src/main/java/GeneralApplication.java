@@ -1,9 +1,9 @@
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.text.DecimalFormat;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class GeneralApplication {
     private InputStream inputStream;
@@ -18,6 +18,7 @@ public class GeneralApplication {
         Scanner scanner = new Scanner(app.getInputStream());
         String s = scanner.nextLine();
         boolean pendingOnStep1 = false;
+        boolean pendingOnStep2 = false;
 
         while(true){
             if(pendingOnStep1){
@@ -26,6 +27,17 @@ public class GeneralApplication {
                     pendingOnStep1 = false;
                 }else{
                     System.out.println("请按正确的格式输入（格式：姓名, 学号, 学科: 成绩, ...）：");
+                    s = scanner.nextLine();
+                    continue;
+                }
+            }
+            if(pendingOnStep2){
+                List<String> list = app.matchStep2Input(s);
+                if(list.size() > 0){
+                    System.out.println(app.generateStudentScoreSheet(list));
+                    pendingOnStep2 = false;
+                }else{
+                    System.out.println("请按正确的格式输入要打印的学生的学号（格式： 学号, 学号,...），按回车提交：");
                     s = scanner.nextLine();
                     continue;
                 }
@@ -40,12 +52,57 @@ public class GeneralApplication {
                 s = scanner.nextLine();
                 continue;
             }
+            if(s.chars().allMatch(Character::isDigit) && Integer.parseInt(s) == 2) {
+                System.out.println(app.printGenerateStudentScoreSheetMessage());
+                pendingOnStep2 = true;
+                s = scanner.nextLine();
+                continue;
+            }
 
             System.out.println("your input is: " + s);
             System.out.println(app.printHelpMessage());
             s = scanner.nextLine();
         }
 
+    }
+
+    public String generateStudentScoreSheet(List<String> input) {
+        List<Double> totalScores = new ArrayList<>();
+        String output = "成绩单\n" +
+                "Name|Math|Yuwen|English|Programming|平均分|总分\n" +
+                "========================\n";
+        for(String id: input){
+            Student s = students.stream()
+                    .filter(student -> student.getId().equals(id))
+                    .collect(Collectors.toList()).get(0);
+            output += s.PrintScoreSheet() + "\n";
+            totalScores.add(s.GetTotalScore());
+        }
+        output += "========================\n";
+        double classAverage = 0.0, classTotalScore = 0.0;
+        for(Double score: totalScores){
+            classTotalScore += score;
+        }
+        classAverage = classTotalScore / totalScores.size();
+        DecimalFormat df = new DecimalFormat("###.#");
+        output += String.format("全班总分平均数：%s\n", df.format(classAverage));
+        output += String.format("全班总分中位数：%s", df.format(getMedianScore(totalScores)));
+        return output;
+    }
+
+    private Double getMedianScore(List<Double> totalScores) {
+        totalScores.sort((o1, o2) -> o1 < o2 ? -1 : 1);
+        int size = totalScores.size();
+        return size % 2 != 0 ?
+                totalScores.get(size / 2) :
+                (totalScores.get(size / 2 -1) + totalScores.get(size / 2)) / 2;
+    }
+
+    public List<String> matchStep2Input(String input) {
+        String[] ids = input.split(",");
+        List<String> inputList = Arrays.asList(ids);
+        List<String> studentIds = students.stream().map(s -> s.getId()).collect(Collectors.toList());
+        return inputList.stream().filter(i -> studentIds.contains(i)).collect(Collectors.toList());
     }
 
     public boolean matchStep1Input(String message) {
@@ -66,6 +123,10 @@ public class GeneralApplication {
 
     public String printEnterStudentRecordMessage() {
         return "请输入学生信息（格式：姓名, 学号, 学科: 成绩, ...），按回车提交：";
+    }
+
+    public String printGenerateStudentScoreSheetMessage(){
+        return "请输入要打印的学生的学号（格式： 学号, 学号,...），按回车提交：";
     }
 
     public void createStudentRecord(String message) {

@@ -8,7 +8,7 @@ public class Course {
         this.score = score;
     }
 
-    public String getCourse() {
+    public String getCourseName() {
         return course;
     }
 
