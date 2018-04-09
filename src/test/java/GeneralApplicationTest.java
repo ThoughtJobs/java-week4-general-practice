@@ -5,31 +5,44 @@ import static org.junit.Assert.assertEquals;
 public class GeneralApplicationTest {
     @Test
     public void applicationPrintTest(){
-        GeneralApplication app = new GeneralApplication(System.in);
+        GeneralApplication app = new GeneralApplication();
         assertEquals("1. 添加学生 \n2. 生成成绩单 \n3. 退出 \n请输入你的选择（1~3）：", app.printHelpMessage());
     }
 
     @Test
     public void should_validate_step1_input_message_format_as_true(){
         String input = "zhangsan, 001, Math: 80, Yuwen: 70, English: 90, Programming: 100";
-        GeneralApplication app = new GeneralApplication(System.in);
+        GeneralApplication app = new GeneralApplication();
+        assertEquals(true, app.matchStep1Input(input));
+    }
+
+    @Test
+    public void should_validate_step1_input_chinese_message_format_as_true(){
+        String input = "张三, 001, 数学: 80, 语文: 70, 英语: 90, 编程: 100";
+        GeneralApplication app = new GeneralApplication();
         assertEquals(true, app.matchStep1Input(input));
     }
 
     @Test
     public void should_validate_step1_input_message_format_as_false(){
         String input = "zhangsan";
-        GeneralApplication app = new GeneralApplication(System.in);
+        GeneralApplication app = new GeneralApplication();
         assertEquals(false, app.matchStep1Input(input));
     }
 
     @Test
-    public void should_create_student_record_after_input_valid_record(){
-        GeneralApplication app = new GeneralApplication(System.in);
+    public void should_not_create_student_record_if_input_record_is_invalid(){
+        GeneralApplication app = new GeneralApplication();
+        String input = "zhangsan";
+        Student s = app.createStudentRecord(input);
+        assertEquals(null, s);
+    }
+
+    @Test
+    public void should_create_student_record_if_input_record_is_valid(){
+        GeneralApplication app = new GeneralApplication();
         String input = "zhangsan, 001, Math: 80, Yuwen: 70, English: 90, Programming: 100";
-        app.createStudentRecord(input);
-        assertEquals(1, app.getStudents().size());
-        Student student = app.getStudents().get(0);
+        Student student = app.createStudentRecord(input);
         assertEquals("zhangsan", student.getName());
         assertEquals("001", student.getId());
         assertEquals(4, student.getCourses().size());
@@ -45,7 +58,7 @@ public class GeneralApplicationTest {
 
     @Test
     public void should_validate_step2_input_existing_student_id(){
-        GeneralApplication app = new GeneralApplication(System.in);
+        GeneralApplication app = new GeneralApplication();
         String input = "zhangsan, 001, Math: 80, Yuwen: 70, English: 90, Programming: 100";
         app.createStudentRecord(input);
         assertEquals(1, app.matchStep2Input("001").size());
@@ -53,7 +66,7 @@ public class GeneralApplicationTest {
 
     @Test
     public void should_ignore_step2_input_notExist_student_id(){
-        GeneralApplication app = new GeneralApplication(System.in);
+        GeneralApplication app = new GeneralApplication();
         String input = "zhangsan, 001, Math: 80, Yuwen: 70, English: 90, Programming: 100";
         app.createStudentRecord(input);
         assertEquals(1, app.matchStep2Input("001, 002").size());
@@ -61,11 +74,23 @@ public class GeneralApplicationTest {
     }
 
     @Test
-    public void should_generate_student_score_sheet_for_given_student_id(){
-        GeneralApplication app = new GeneralApplication(System.in);
+    public void should_match_multiple_student_ids(){
+        GeneralApplication app = new GeneralApplication();
         String input = "zhangsan, 001, Math: 80, Yuwen: 70, English: 90, Programming: 100";
         app.createStudentRecord(input);
-        String scoreSheet = app.generateStudentScoreSheet(Arrays.asList("001"));
+        input = "lisi, 002, Math: 85, Yuwen: 80, English: 70, Programming: 90";
+        app.createStudentRecord(input);
+        assertEquals(2, app.matchStep2Input("001, 002").size());
+        assertEquals("001", app.matchStep2Input("001, 002").get(0));
+        assertEquals("002", app.matchStep2Input("001, 002").get(1));
+    }
+
+    @Test
+    public void should_generate_student_score_sheet_for_given_student_id(){
+        GeneralApplication app = new GeneralApplication();
+        String input = "zhangsan, 100, Math: 80, Yuwen: 70, English: 90, Programming: 100";
+        app.createStudentRecord(input);
+        String scoreSheet = app.generateStudentScoreSheet(Arrays.asList("100"));
         assertEquals("成绩单\n" +
                 "Name|Math|Yuwen|English|Programming|平均分|总分\n" +
                 "========================\n" +
@@ -77,12 +102,12 @@ public class GeneralApplicationTest {
 
     @Test
     public void should_generate_student_score_sheet_for_multiple_student_id(){
-        GeneralApplication app = new GeneralApplication(System.in);
-        String input = "zhangsan, 001, Math: 75, Yuwen: 95, English: 80, Programming: 80";
+        GeneralApplication app = new GeneralApplication();
+        String input = "zhangsan, 100, Math: 75, Yuwen: 95, English: 80, Programming: 80";
         app.createStudentRecord(input);
-        input = "lisi, 002, Math: 85, Yuwen: 80, English: 70, Programming: 90";
+        input = "lisi, 101, Math: 85, Yuwen: 80, English: 70, Programming: 90";
         app.createStudentRecord(input);
-        String scoreSheet = app.generateStudentScoreSheet(Arrays.asList("001", "002"));
+        String scoreSheet = app.generateStudentScoreSheet(Arrays.asList("100", "101"));
         assertEquals("成绩单\n" +
                 "Name|Math|Yuwen|English|Programming|平均分|总分\n" +
                 "========================\n" +
